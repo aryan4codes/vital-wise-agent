@@ -1,1 +1,4 @@
 project_id = "xwrrforhndpinxatxqda"
+
+[functions."parse-prescription"]
+verify_jwt = false
