@@ -16,6 +16,32 @@ const corsHeaders = {
  */
 async function parsePrescriptionAgent(fileUrl: string, openAIKey: string) {
   console.log("🤖 Parser Agent: Starting prescription analysis...");
+  console.log("File URL type:", fileUrl?.substring(0, 50));
+  
+  // Prepare image for OpenAI Vision API
+  let imageContent: any = {};
+  
+  if (fileUrl.startsWith('data:')) {
+    // Handle data URL - extract and use directly
+    console.log("Processing data URL...");
+    imageContent = {
+      type: 'image_url',
+      image_url: {
+        url: fileUrl
+      }
+    };
+  } else if (fileUrl.startsWith('http')) {
+    // Handle regular URL
+    console.log("Processing regular URL...");
+    imageContent = {
+      type: 'image_url',
+      image_url: {
+        url: fileUrl
+      }
+    };
+  } else {
+    throw new Error(`Invalid file URL format: ${fileUrl?.substring(0, 50)}`);
+  }
   
   const response = await fetch('https://api.openai.com/v1/chat/completions', {
     method: 'POST',
@@ -52,7 +78,7 @@ Return a JSON object with this structure:
   "notes": "any additional notes"
 }
 
-Be thorough and accurate. Extract ALL medications mentioned.`
+Be thorough and accurate. Extract ALL medications mentioned. If no medications found, return empty medications array.`
         },
         {
           role: 'user',
@@ -61,12 +87,7 @@ Be thorough and accurate. Extract ALL medications mentioned.`
               type: 'text',
               text: 'Please analyze this prescription and extract all medication details:'
             },
-            {
-              type: 'image_url',
-              image_url: {
-                url: fileUrl
-              }
-            }
+            imageContent
           ]
         }
       ],
@@ -74,14 +95,46 @@ Be thorough and accurate. Extract ALL medications mentioned.`
     }),
   });
 
+  console.log("OpenAI response status:", response.status);
   const data = await response.json();
-  const content = data.choices[0].message.content;
+  
+  if (!response.ok) {
+    console.error("OpenAI API error:", JSON.stringify(data, null, 2));
+    throw new Error(`OpenAI API error: ${data.error?.message || `Status ${response.status}`}`);
+  }
+  
+  if (!data.choices || !data.choices[0]) {
+    console.error("Invalid OpenAI response structure:", JSON.stringify(data, null, 2));
+    throw new Error("Invalid response from OpenAI API - no choices returned");
+  }
+  
+  const content = data.choices[0].message?.content;
+  if (!content) {
+    console.error("No content in OpenAI response:", JSON.stringify(data.choices[0], null, 2));
+    throw new Error("No content returned from OpenAI");
+  }
+
+  console.log("Raw content from OpenAI:", content.substring(0, 200));
   
   // Extract JSON from markdown code blocks if present
   const jsonMatch = content.match(/```json\n([\s\S]*?)\n```/) || content.match(/```\n([\s\S]*?)\n```/);
   const jsonStr = jsonMatch ? jsonMatch[1] : content;
   
-  const result = JSON.parse(jsonStr);
+  console.log("JSON string to parse:", jsonStr.substring(0, 200));
+  
+  let result;
+  try {
+    result = JSON.parse(jsonStr);
+  } catch (parseErr) {
+    console.error("JSON parse error:", parseErr, "Content:", jsonStr);
+    throw new Error(`Failed to parse medication data: ${(parseErr as any).message}`);
+  }
+  
+  if (!result.medications || !Array.isArray(result.medications)) {
+    console.warn("Invalid medication data structure, using empty array");
+    result.medications = [];
+  }
+  
   console.log("✅ Parser Agent: Extracted", result.medications?.length || 0, "medications");
   return result;
 }
@@ -247,15 +300,29 @@ serve(async (req) => {
   }
 
   try {
+    console.log("🚀 Request received");
+    
+    // Debug: Log all env vars (sanitized)
     const openAIKey = Deno.env.get('OPENAI_API_KEY');
+    const supabaseUrl = Deno.env.get('SUPABASE_URL');
+    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+    
+    console.log("Environment check:");
+    console.log("✓ OPENAI_API_KEY exists:", !!openAIKey);
+    console.log("✓ SUPABASE_URL exists:", !!supabaseUrl);
+    console.log("✓ SUPABASE_SERVICE_ROLE_KEY exists:", !!supabaseKey);
+    
     if (!openAIKey) {
-      throw new Error('OPENAI_API_KEY not configured');
+      console.error("❌ OPENAI_API_KEY is not set in Supabase Edge Functions");
+      throw new Error('OPENAI_API_KEY not configured in Supabase Edge Functions secrets');
+    }
+    
+    if (!supabaseUrl || !supabaseKey) {
+      console.error("❌ Missing Supabase configuration");
+      throw new Error('Missing Supabase URL or Service Role Key');
     }
 
-    const supabaseClient = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
-    );
+    const supabaseClient = createClient(supabaseUrl, supabaseKey);
 
     const { prescriptionId, fileUrl } = await req.json();
     console.log("🚀 Starting multi-agent prescription processing...");

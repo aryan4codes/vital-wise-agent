@@ -7,13 +7,14 @@ import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { toast } from "@/hooks/use-toast";
 import { Heart } from "lucide-react";
-import { STATIC_ADMIN_USER_ID, STATIC_ADMIN_USER } from "@/lib/constants";
+import { useAuth } from "@/hooks/use-auth";
 
 export default function Onboarding() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
-    full_name: STATIC_ADMIN_USER.full_name,
+    full_name: "",
     date_of_birth: "",
     phone: "",
     emergency_contact: "",
@@ -25,14 +26,15 @@ export default function Onboarding() {
     setLoading(true);
 
     try {
-      console.log("Creating/updating profile for admin user:", STATIC_ADMIN_USER_ID);
+      if (!user) return;
+      console.log("Creating/updating profile for user:", user.id);
       console.log("Profile data:", formData);
 
       // Use upsert to handle both new profiles and updates to auto-created profiles
       const { data, error } = await supabase
         .from("patient_profiles")
         .upsert({
-          id: STATIC_ADMIN_USER_ID,
+          id: user.id,
           ...formData,
         }, {
           onConflict: 'id'
@@ -48,7 +50,7 @@ export default function Onboarding() {
 
       toast({
         title: "Profile created!",
-        description: "Welcome to HealthGuard",
+        description: "Welcome to VitalWise",
       });
 
       navigate("/dashboard");
