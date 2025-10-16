@@ -11,6 +11,7 @@ import {
   Pill,
   RefreshCw,
   Send,
+  Shield,
   TrendingDown,
   X,
 } from "lucide-react";
@@ -427,7 +428,29 @@ export default function MedicationInventory() {
               </p>
             </div>
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 sm:gap-4">
+            {/* Safety Validation Button */}
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => navigate("/safety-validation")}
+              className="hidden sm:flex items-center gap-2"
+            >
+              <Shield className="h-4 w-4" />
+              Safety Check
+            </Button>
+            
+            {/* Safety Validation Icon (Mobile) */}
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => navigate("/safety-validation")}
+              className="sm:hidden"
+              title="Safety Validation"
+            >
+              <Shield className="h-5 w-5" />
+            </Button>
+
             {/* Chat Toggle */}
             <Button
               variant="ghost"

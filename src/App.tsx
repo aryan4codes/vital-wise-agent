@@ -14,6 +14,7 @@ import Alerts from "./pages/Alerts";
 import Schedule from "./pages/Schedule";
 import CaregiverCommunication from "./pages/CaregiverCommunication";
 import MedicationInventory from "./pages/MedicationInventory";
+import SafetyValidation from "./pages/SafetyValidation";
 import NotFound from "./pages/NotFound";
 import { AuthProvider, useAuth } from "@/hooks/use-auth";
 
@@ -44,6 +45,7 @@ const App = () => (
             <Route path="/vitals/log" element={<PrivateRoute><VitalsLog /></PrivateRoute>} />
             <Route path="/alerts" element={<PrivateRoute><Alerts /></PrivateRoute>} />
             <Route path="/schedule" element={<PrivateRoute><Schedule /></PrivateRoute>} />
+            <Route path="/safety-validation" element={<PrivateRoute><SafetyValidation /></PrivateRoute>} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
         </Routes>
