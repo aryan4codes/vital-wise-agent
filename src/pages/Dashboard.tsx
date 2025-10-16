@@ -15,7 +15,8 @@ import {
   AlertCircle,
   Clock,
   ArrowRight,
-  LogOut
+  LogOut,
+  MessageSquare
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -408,6 +409,7 @@ export default function Dashboard() {
               { label: "Log Vitals", desc: "Record health measurements", icon: Heart, path: "/vitals/log", bgGradient: "from-red-600 to-red-700", iconBg: "bg-red-500/20" },
               { label: "View Schedule", desc: "Check medication timeline", icon: Calendar, path: "/schedule", bgGradient: "from-green-600 to-green-700", iconBg: "bg-green-500/20" },
               { label: "Medication Inventory", desc: "Track your medications", icon: Pill, path: "/inventory", bgGradient: "from-purple-600 to-purple-700", iconBg: "bg-purple-500/20" },
+              { label: "Caregiver Chat", desc: "Message your caregiver", icon: MessageSquare, path: "/caregiver-communication", bgGradient: "from-indigo-600 to-indigo-700", iconBg: "bg-indigo-500/20" },
             ].map((action, idx) => {
               const ActionIcon = action.icon;
               return (  
