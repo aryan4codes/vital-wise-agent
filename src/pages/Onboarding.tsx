@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -7,12 +7,13 @@ import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { toast } from "@/hooks/use-toast";
 import { Heart } from "lucide-react";
+import { STATIC_ADMIN_USER_ID, STATIC_ADMIN_USER } from "@/lib/constants";
 
 export default function Onboarding() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
-    full_name: "",
+    full_name: STATIC_ADMIN_USER.full_name,
     date_of_birth: "",
     phone: "",
     emergency_contact: "",
@@ -24,17 +25,26 @@ export default function Onboarding() {
     setLoading(true);
 
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("Not authenticated");
+      console.log("Creating/updating profile for admin user:", STATIC_ADMIN_USER_ID);
+      console.log("Profile data:", formData);
 
-      const { error } = await supabase
+      // Use upsert to handle both new profiles and updates to auto-created profiles
+      const { data, error } = await supabase
         .from("patient_profiles")
-        .insert({
-          id: user.id,
+        .upsert({
+          id: STATIC_ADMIN_USER_ID,
           ...formData,
-        });
+        }, {
+          onConflict: 'id'
+        })
+        .select();
 
-      if (error) throw error;
+      if (error) {
+        console.error("Database error:", error);
+        throw new Error(error.message || "Failed to create profile");
+      }
+
+      console.log("Profile saved successfully:", data);
 
       toast({
         title: "Profile created!",
@@ -42,10 +52,12 @@ export default function Onboarding() {
       });
 
       navigate("/dashboard");
-    } catch (error: any) {
+    } catch (error) {
+      console.error("Profile creation error:", error);
+      const errorMessage = error instanceof Error ? error.message : "An unexpected error occurred";
       toast({
         title: "Error creating profile",
-        description: error.message,
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {
