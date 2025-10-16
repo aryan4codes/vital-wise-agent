@@ -502,11 +502,11 @@ export default function MedicationInventory() {
           {/* AI Chat Feature Callout */}
           <Alert className="mb-8 border-primary/50 bg-primary/5">
             <MessageSquare className="h-4 w-4 text-primary" />
-            <AlertTitle>AI Chat Assistant Available</AlertTitle>
+            <AlertTitle>Crew AI Assistant Available</AlertTitle>
             <AlertDescription>
               Click the chat icon to talk to your medication assistant! Just say
               "I took my Lisinopril" or "I missed my dose" and I'll update your
-              inventory automatically using Crew AI.
+              inventory automatically using agentic AI.
             </AlertDescription>
           </Alert>
 
