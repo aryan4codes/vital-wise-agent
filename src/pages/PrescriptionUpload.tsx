@@ -7,10 +7,11 @@ import { toast } from "@/hooks/use-toast";
 import { Upload, FileText, Camera, ArrowLeft, Loader2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { STATIC_ADMIN_USER_ID } from "@/lib/constants";
+import { useAuth } from "@/hooks/use-auth";
 
 export default function PrescriptionUpload() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [loading, setLoading] = useState(false);
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
@@ -57,10 +58,10 @@ export default function PrescriptionUpload() {
   };
 
   const uploadPrescription = async () => {
-    if (!file) {
+    if (!file || !user) {
       toast({
-        title: "No file selected",
-        description: "Please select a prescription file to upload",
+        title: "Missing information",
+        description: !file ? "Please select a prescription file to upload" : "You must be signed in",
         variant: "destructive",
       });
       return;
@@ -86,7 +87,7 @@ export default function PrescriptionUpload() {
       const { data: prescription, error: dbError } = await supabase
         .from("prescriptions")
         .insert({
-          patient_id: STATIC_ADMIN_USER_ID,
+          patient_id: user.id,
           doctor_name: doctorName || null,
           prescription_date: prescriptionDate,
           file_url: fileDataUrl, // Store as data URL
@@ -144,19 +145,31 @@ export default function PrescriptionUpload() {
         },
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error("Function error:", error);
+        throw new Error(error.message || "Error processing prescription");
+      }
+
+      if (!data) {
+        console.error("No data returned from function");
+        throw new Error("No response from prescription processing");
+      }
+
+      console.log("Processing result:", data);
 
       toast({
         title: "Processing complete!",
-        description: "Your medications have been added to your schedule",
+        description: "Redirecting to prescription details...",
       });
 
-      navigate("/dashboard");
+      // Navigate to prescription details page instead of dashboard
+      navigate(`/prescriptions/${prescriptionId}`);
     } catch (error: any) {
       console.error("AI processing error:", error);
+      const errorMsg = error?.message || "Unknown error during prescription processing";
       toast({
         title: "Processing incomplete",
-        description: "Prescription saved but needs manual review",
+        description: errorMsg,
         variant: "destructive",
       });
       navigate("/dashboard");

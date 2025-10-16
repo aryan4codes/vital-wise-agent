@@ -408,8 +408,8 @@ export default function MedicationInventory() {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="border-b border-border bg-card shadow-card">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
+      <header className="border-b border-border bg-card shadow-card sticky top-0 z-50">
+        <div className="container mx-auto px-4 py-3 sm:py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Button
               variant="ghost"
@@ -419,10 +419,10 @@ export default function MedicationInventory() {
               <Heart className="h-6 w-6" />
             </Button>
             <div>
-              <h1 className="text-2xl font-bold text-foreground">
+              <h1 className="text-xl sm:text-2xl font-bold text-foreground">
                 Medication Inventory
               </h1>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-xs sm:text-sm text-muted-foreground hidden sm:block">
                 Track and manage your medication supply
               </p>
             </div>
@@ -454,11 +454,11 @@ export default function MedicationInventory() {
       </header>
 
       {/* Main Content with Chat Sidebar */}
-      <div className="flex">
+      <div className="flex justify-center">
         {/* Main Content */}
-        <main className={`flex-1 container mx-auto px-4 py-8 transition-all ${chatOpen ? "mr-96" : ""}`}>
+        <main className={`w-full max-w-6xl px-4 py-8 transition-all ${chatOpen ? "hidden sm:block sm:mr-96" : "mx-auto"}`}>
           {/* Summary Stats */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-8">
             <Card className="p-6 shadow-card border-destructive/30">
               <div className="flex items-center justify-between mb-4">
                 <div className="p-3 bg-destructive/10 rounded-lg">
@@ -502,11 +502,11 @@ export default function MedicationInventory() {
           {/* AI Chat Feature Callout */}
           <Alert className="mb-8 border-primary/50 bg-primary/5">
             <MessageSquare className="h-4 w-4 text-primary" />
-            <AlertTitle>AI Chat Assistant Available</AlertTitle>
+            <AlertTitle>Crew AI Assistant Available</AlertTitle>
             <AlertDescription>
               Click the chat icon to talk to your medication assistant! Just say
               "I took my Lisinopril" or "I missed my dose" and I'll update your
-              inventory automatically using Crew AI.
+              inventory automatically using agentic AI.
             </AlertDescription>
           </Alert>
 
@@ -531,7 +531,7 @@ export default function MedicationInventory() {
                       : "border-success/30"
                   }`}
                 >
-                  <div className="flex flex-col lg:flex-row gap-6">
+                  <div className="flex flex-col xl:flex-row gap-6">
                     {/* Medication Info */}
                     <div className="flex-1">
                       <div className="flex items-start justify-between mb-4">
@@ -603,7 +603,7 @@ export default function MedicationInventory() {
                       </div>
 
                       {/* Days of Supply Alert */}
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
                         <div
                           className={`p-4 rounded-lg ${
                             alertLevel === "critical"
@@ -667,7 +667,7 @@ export default function MedicationInventory() {
                     </div>
 
                     {/* Update Inventory Section */}
-                    <div className="lg:w-64 border-t lg:border-t-0 lg:border-l pt-6 lg:pt-0 lg:pl-6">
+                    <div className="xl:w-64 border-t xl:border-t-0 xl:border-l pt-6 xl:pt-0 xl:pl-6">
                       <h4 className="font-semibold mb-4 flex items-center gap-2">
                         <Package className="h-4 w-4" />
                         Update Count
@@ -792,12 +792,12 @@ export default function MedicationInventory() {
 
         {/* Chat Sidebar */}
         {chatOpen && (
-          <div className="fixed right-0 top-0 h-screen w-96 bg-card border-l border-border shadow-xl flex flex-col z-50">
-            {/* Chat Header */}
-            <div className="p-4 border-b border-border flex items-center justify-between">
+          <div className="fixed right-0 top-0 sm:top-[73px] h-screen sm:h-[calc(100vh-73px)] w-full sm:w-96 bg-card border-l border-border shadow-xl flex flex-col z-40">
+            {/* Mobile Header - Only visible on mobile */}
+            <div className="sm:hidden p-3 border-b border-border flex items-center justify-between bg-card">
               <div className="flex items-center gap-2">
-                <MessageSquare className="h-5 w-5 text-primary" />
-                <h3 className="font-semibold">Medication Assistant</h3>
+                <Heart className="h-6 w-6 text-primary" />
+                <span className="font-bold text-lg">VitalWise</span>
               </div>
               <Button
                 variant="ghost"
@@ -808,9 +808,25 @@ export default function MedicationInventory() {
               </Button>
             </div>
 
+            {/* Chat Header */}
+            <div className="p-3 sm:p-4 border-b border-border flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <MessageSquare className="h-5 w-5 text-primary" />
+                <h3 className="font-semibold text-sm sm:text-base">Medication Assistant</h3>
+              </div>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setChatOpen(false)}
+                className="hidden sm:flex"
+              >
+                <X className="h-5 w-5" />
+              </Button>
+            </div>
+
             {/* Chat Messages */}
-            <ScrollArea className="flex-1 p-4">
-              <div className="space-y-4">
+            <ScrollArea className="flex-1 p-3 sm:p-4">
+              <div className="space-y-3 sm:space-y-4">
                 {chatMessages.map((msg, idx) => (
                   <div
                     key={idx}
@@ -819,15 +835,15 @@ export default function MedicationInventory() {
                     }`}
                   >
                     <div
-                      className={`max-w-[80%] rounded-lg px-4 py-2 ${
+                      className={`max-w-[85%] sm:max-w-[80%] rounded-lg px-3 sm:px-4 py-2 ${
                         msg.role === "user"
                           ? "bg-primary text-primary-foreground"
                           : "bg-muted"
                       }`}
                     >
-                      <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
+                      <p className="text-xs sm:text-sm whitespace-pre-wrap">{msg.content}</p>
                       <p className="text-xs opacity-70 mt-1">
-                        {new Date(msg.timestamp).toLocaleTimeString()}
+                        {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                       </p>
                     </div>
                   </div>
@@ -848,10 +864,10 @@ export default function MedicationInventory() {
             </ScrollArea>
 
             {/* Chat Input */}
-            <div className="p-4 border-t border-border">
+            <div className="p-3 sm:p-4 border-t border-border">
               <div className="flex gap-2">
                 <Textarea
-                  placeholder="Type a message... (e.g., 'I took my Lisinopril')"
+                  placeholder="Type a message..."
                   value={chatInput}
                   onChange={(e) => setChatInput(e.target.value)}
                   onKeyDown={(e) => {
@@ -860,14 +876,14 @@ export default function MedicationInventory() {
                       sendMessage();
                     }
                   }}
-                  className="resize-none"
+                  className="resize-none text-sm"
                   rows={2}
                 />
                 <Button
                   onClick={sendMessage}
                   disabled={isSending || !chatInput.trim()}
                   size="icon"
-                  className="self-end"
+                  className="self-end flex-shrink-0"
                 >
                   <Send className="h-4 w-4" />
                 </Button>
