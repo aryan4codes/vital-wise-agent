@@ -284,6 +284,18 @@ export default function Dashboard() {
                   <div className="text-xs opacity-70">Medication timeline</div>
                 </div>
               </Button>
+
+              <Button 
+                onClick={() => navigate("/caregiver-communication")}
+                variant="outline"
+                className="h-auto py-6 flex-col gap-3 border-2 hover:border-primary hover:bg-accent transition-colors"
+              >
+                <Users className="h-8 w-8" />
+                <div>
+                  <div className="font-semibold">Caregiver Updates</div>
+                  <div className="text-xs opacity-70">Share health summaries</div>
+                </div>
+              </Button>
             </div>
           </Card>
 
