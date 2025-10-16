@@ -12,6 +12,7 @@ import PrescriptionDetails from "./pages/PrescriptionDetails";
 import VitalsLog from "./pages/VitalsLog";
 import Alerts from "./pages/Alerts";
 import Schedule from "./pages/Schedule";
+import CaregiverCommunication from "./pages/CaregiverCommunication";
 import MedicationInventory from "./pages/MedicationInventory";
 import NotFound from "./pages/NotFound";
 import { AuthProvider, useAuth } from "@/hooks/use-auth";
@@ -38,7 +39,8 @@ const App = () => (
             <Route path="/onboarding" element={<PrivateRoute><Onboarding /></PrivateRoute>} />
             <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
             <Route path="/prescriptions/upload" element={<PrivateRoute><PrescriptionUpload /></PrivateRoute>} />
-            <Route path="/prescriptions/:id" element={<PrivateRoute><PrescriptionDetails /></PrivateRoute>} />
+            <Route path="/caregiver-communication" element={<CaregiverCommunication />} />
+          <Route path="/prescriptions/:id" element={<PrivateRoute><PrescriptionDetails /></PrivateRoute>} />
             <Route path="/vitals/log" element={<PrivateRoute><VitalsLog /></PrivateRoute>} />
             <Route path="/alerts" element={<PrivateRoute><Alerts /></PrivateRoute>} />
             <Route path="/schedule" element={<PrivateRoute><Schedule /></PrivateRoute>} />
