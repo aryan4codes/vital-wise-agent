@@ -6,3 +6,6 @@ export const STATIC_ADMIN_USER = {
   full_name: "Admin User",
 };
 
+// Gemini API Configuration
+// Add your Gemini API key here or use environment variable
+export const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY || "YOUR_GEMINI_API_KEY_HERE";

@@ -237,7 +237,7 @@ export default function Dashboard() {
           {/* Quick Actions */}
           <Card className="p-8 mb-8 shadow-card">
             <h3 className="text-xl font-bold mb-6">Quick Actions</h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
               <Button 
                 onClick={() => navigate("/prescriptions/upload")}
                 className="h-auto py-6 flex-col gap-3 bg-primary hover:bg-primary-light transition-colors"
@@ -246,6 +246,18 @@ export default function Dashboard() {
                 <div>
                   <div className="font-semibold">Upload Prescription</div>
                   <div className="text-xs opacity-90">AI-powered parsing</div>
+                </div>
+              </Button>
+
+              <Button 
+                onClick={() => navigate("/inventory")}
+                variant="outline"
+                className="h-auto py-6 flex-col gap-3 border-2 hover:border-primary hover:bg-accent transition-colors"
+              >
+                <Pill className="h-8 w-8" />
+                <div>
+                  <div className="font-semibold">Medication Inventory</div>
+                  <div className="text-xs opacity-70">Track refills & supply</div>
                 </div>
               </Button>
 
