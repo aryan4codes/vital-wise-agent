@@ -69,8 +69,33 @@ const LandingPage = () => {
 
   return (
     <div className="min-h-screen bg-white">
+      {/* Header Navigation */}
+      <header className="absolute top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-sm border-b border-slate-200/50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Heart className="w-8 h-8 text-blue-600" />
+            <span className="text-2xl font-bold text-slate-900">VitalWise</span>
+          </div>
+          <div className="flex items-center gap-4">
+            <Button
+              variant="ghost"
+              onClick={() => navigate('/auth')}
+              className="text-slate-700 hover:text-slate-900"
+            >
+              Sign In
+            </Button>
+            <Button
+              onClick={() => navigate('/auth')}
+              className="bg-blue-600 hover:bg-blue-700 text-white"
+            >
+              Get Started
+            </Button>
+          </div>
+        </div>
+      </header>
+
       {/* Hero Section */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-blue-50 via-white to-blue-100/40 min-h-screen flex items-center">
+      <section className="relative overflow-hidden bg-gradient-to-br from-blue-50 via-white to-blue-100/40 min-h-screen flex items-center pt-20">
         {/* Animated Background - Flowing Waves */}
         <div className="absolute inset-0">
           {/* Large flowing waves */}
@@ -127,10 +152,10 @@ const LandingPage = () => {
           <div className="text-center max-w-4xl mx-auto">
             <Badge 
               className="mb-8 bg-white/80 text-blue-700 hover:bg-blue-50/80 border-blue-200/60 px-4 py-2 text-sm font-medium backdrop-blur-sm shadow-sm cursor-pointer"
-              onClick={() => navigate('/inventory')}
+              onClick={() => navigate('/auth')}
             >
               <Sparkles className="w-4 h-4 mr-2" />
-              Try the AI Assistant Now!
+              Get Started - It's Free!
             </Badge>
             
             <h1 className="text-5xl sm:text-6xl lg:text-7xl font-sans tracking-tight text-slate-900 mb-8">
@@ -148,19 +173,19 @@ const LandingPage = () => {
               <Button 
                 size="lg" 
                 className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 text-lg font-medium rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 backdrop-blur-sm"
-                onClick={() => navigate('/inventory')}
+                onClick={() => navigate('/auth')}
               >
-                <span>Start Tracking Now</span>
+                <span>Get Started Free</span>
                 <ArrowRight className="w-5 h-5 ml-2" />
               </Button>
               <Button 
                 variant="outline" 
                 size="lg" 
                 className="border-blue-300/60 text-blue-700 hover:bg-blue-50/60 px-8 py-4 text-lg font-medium rounded-lg backdrop-blur-sm bg-white/60"
-                onClick={() => navigate('/dashboard')}
+                onClick={() => navigate('/inventory')}
               >
-                <Heart className="w-5 h-5 mr-2" />
-                <span>View Dashboard</span>
+                <Brain className="w-5 h-5 mr-2" />
+                <span>Try Demo</span>
               </Button>
             </div>
 

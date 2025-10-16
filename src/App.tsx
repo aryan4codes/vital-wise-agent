@@ -29,18 +29,24 @@ const App = () => (
     <TooltipProvider>
       <Toaster />
       <Sonner />
+      <AuthProvider>
       <BrowserRouter>
         <Routes>
-        <Route path="/" element={<LandingPage />} />
-          <Route path="/home" element={<Index />} />
-          <Route path="/onboarding" element={<Onboarding />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/prescriptions/upload" element={<PrescriptionUpload />} />
-          <Route path="/inventory" element={<MedicationInventory />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
+            <Route path="/" element={<LandingPage />} />
+            <Route path="/auth" element={<Index />} />
+            <Route path="/inventory" element={<PrivateRoute><MedicationInventory /></PrivateRoute>} />
+            <Route path="/onboarding" element={<PrivateRoute><Onboarding /></PrivateRoute>} />
+            <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
+            <Route path="/prescriptions/upload" element={<PrivateRoute><PrescriptionUpload /></PrivateRoute>} />
+            <Route path="/prescriptions/:id" element={<PrivateRoute><PrescriptionDetails /></PrivateRoute>} />
+            <Route path="/vitals/log" element={<PrivateRoute><VitalsLog /></PrivateRoute>} />
+            <Route path="/alerts" element={<PrivateRoute><Alerts /></PrivateRoute>} />
+            <Route path="/schedule" element={<PrivateRoute><Schedule /></PrivateRoute>} />
+            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+            <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
+      </AuthProvider>
     </TooltipProvider>
   </QueryClientProvider>
 );

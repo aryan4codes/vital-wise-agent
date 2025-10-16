@@ -14,7 +14,8 @@ import {
   CheckCircle,
   AlertCircle,
   Clock,
-  ArrowRight
+  ArrowRight,
+  LogOut
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -57,7 +58,7 @@ interface Vital {
 
 export default function Dashboard() {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, signOut } = useAuth();
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState<DashboardStats>({
     activeMedications: 0,
@@ -148,7 +149,7 @@ export default function Dashboard() {
       setVitals(vitalsRes.data || []);
 
       const missedSchedules = schedulesRes.data?.filter(
-        (s: any) => s.status === "missed"
+        (s) => s.status === "missed"
       ).length || 0;
 
       setStats({
@@ -319,18 +320,32 @@ export default function Dashboard() {
               </div>
             </div>
             
-            <motion.button
-              className="relative p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
-              whileHover={{ scale: 1.05 }}
-              onClick={() => navigate("/alerts")}
-            >
-              <Bell className="h-5 w-5" />
-              {stats.pendingAlerts > 0 && (
-                <span className="absolute top-1 right-1 h-4 w-4 bg-red-500 rounded-full flex items-center justify-center text-xs font-semibold text-white">
-                  {stats.pendingAlerts}
-                </span>
-              )}
-            </motion.button>
+            <div className="flex items-center gap-2">
+              <motion.button
+                className="relative p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+                whileHover={{ scale: 1.05 }}
+                onClick={() => navigate("/alerts")}
+              >
+                <Bell className="h-5 w-5" />
+                {stats.pendingAlerts > 0 && (
+                  <span className="absolute top-1 right-1 h-4 w-4 bg-red-500 rounded-full flex items-center justify-center text-xs font-semibold text-white">
+                    {stats.pendingAlerts}
+                  </span>
+                )}
+              </motion.button>
+              
+              <motion.button
+                className="flex items-center gap-2 px-3 py-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+                whileHover={{ scale: 1.05 }}
+                onClick={async () => {
+                  await signOut();
+                  navigate('/');
+                }}
+              >
+                <LogOut className="h-4 w-4" />
+                <span className="text-sm font-medium">Sign Out</span>
+              </motion.button>
+            </div>
           </div>
         </div>
       </header>
@@ -392,9 +407,10 @@ export default function Dashboard() {
               { label: "Upload Prescription", desc: "Add prescription document", icon: Upload, path: "/prescriptions/upload", bgGradient: "from-blue-600 to-blue-700", iconBg: "bg-blue-500/20" },
               { label: "Log Vitals", desc: "Record health measurements", icon: Heart, path: "/vitals/log", bgGradient: "from-red-600 to-red-700", iconBg: "bg-red-500/20" },
               { label: "View Schedule", desc: "Check medication timeline", icon: Calendar, path: "/schedule", bgGradient: "from-green-600 to-green-700", iconBg: "bg-green-500/20" },
+              { label: "Medication Inventory", desc: "Track your medications", icon: Pill, path: "/inventory", bgGradient: "from-purple-600 to-purple-700", iconBg: "bg-purple-500/20" },
             ].map((action, idx) => {
               const ActionIcon = action.icon;
-              return (
+              return (  
                 <motion.button
                   key={idx}
                   onClick={() => navigate(action.path)}
