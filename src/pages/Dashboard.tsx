@@ -16,6 +16,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "@/hooks/use-toast";
+import { STATIC_ADMIN_USER_ID, STATIC_ADMIN_USER } from "@/lib/constants";
 
 interface DashboardStats {
   activeMedications: number;
@@ -35,36 +36,37 @@ export default function Dashboard() {
     pendingAlerts: 0,
     vitalsLogged: 0,
   });
-  const [user, setUser] = useState<any>(null);
 
   useEffect(() => {
-    checkAuth();
+    loadDashboardData();
   }, []);
 
-  const checkAuth = async () => {
-    const { data: { session } } = await supabase.auth.getSession();
-    
-    if (!session) {
-      navigate("/auth");
-      return;
-    }
-
-    setUser(session.user);
-    await loadDashboardData(session.user.id);
-  };
-
-  const loadDashboardData = async (userId: string) => {
+  const loadDashboardData = async () => {
     try {
-      // Check if profile exists
-      const { data: profile } = await supabase
+      // Check if profile exists, if not create it
+      const { data: profile, error: profileError } = await supabase
         .from("patient_profiles")
         .select("*")
-        .eq("id", userId)
+        .eq("id", STATIC_ADMIN_USER_ID)
         .maybeSingle();
 
+      // If there's a permission error, log it but continue
+      if (profileError && !profileError.message.includes("Row not found")) {
+        console.warn("Profile access warning:", profileError);
+      }
+
       if (!profile) {
-        navigate("/onboarding");
-        return;
+        // Try to create admin profile, but don't fail if it errors
+        const { error: insertError } = await supabase
+          .from("patient_profiles")
+          .insert({
+            id: STATIC_ADMIN_USER_ID,
+            full_name: STATIC_ADMIN_USER.full_name,
+          });
+        
+        if (insertError) {
+          console.warn("Could not create profile (may already exist):", insertError);
+        }
       }
 
       // Load stats
@@ -75,22 +77,22 @@ export default function Dashboard() {
         supabase
           .from("medications")
           .select("*")
-          .eq("patient_id", userId)
+          .eq("patient_id", STATIC_ADMIN_USER_ID)
           .eq("is_active", true),
         supabase
           .from("medication_schedules")
           .select("*")
-          .eq("patient_id", userId)
+          .eq("patient_id", STATIC_ADMIN_USER_ID)
           .gte("scheduled_time", today.toISOString()),
           supabase
           .from("health_alerts")
           .select("*")
-          .eq("patient_id", userId)
+          .eq("patient_id", STATIC_ADMIN_USER_ID)
           .eq("status", "pending"),
         supabase
           .from("health_vitals")
           .select("*")
-          .eq("patient_id", userId)
+          .eq("patient_id", STATIC_ADMIN_USER_ID)
           .gte("measured_at", today.toISOString()),
       ]);
 
@@ -105,12 +107,24 @@ export default function Dashboard() {
         pendingAlerts: alerts.data?.length || 0,
         vitalsLogged: vitals.data?.length || 0,
       });
-    } catch (error: any) {
-      toast({
-        title: "Error loading dashboard",
-        description: error.message,
-        variant: "destructive",
-      });
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "Unknown error";
+      console.error("Dashboard loading error:", errorMessage);
+      
+      // Show toast but continue - RLS errors are non-fatal
+      if (errorMessage.includes("row-level security") || errorMessage.includes("permission")) {
+        toast({
+          title: "Limited access",
+          description: "Some features may not be available. Check database permissions.",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Error loading dashboard",
+          description: errorMessage,
+          variant: "destructive",
+        });
+      }
     } finally {
       setLoading(false);
     }
@@ -232,6 +246,18 @@ export default function Dashboard() {
                 <div>
                   <div className="font-semibold">Upload Prescription</div>
                   <div className="text-xs opacity-90">AI-powered parsing</div>
+                </div>
+              </Button>
+
+              <Button 
+                onClick={() => navigate("/inventory")}
+                variant="outline"
+                className="h-auto py-6 flex-col gap-3 border-2 hover:border-primary hover:bg-accent transition-colors"
+              >
+                <Pill className="h-8 w-8" />
+                <div>
+                  <div className="font-semibold">Medication Inventory</div>
+                  <div className="text-xs opacity-70">Track refills & supply</div>
                 </div>
               </Button>
 
