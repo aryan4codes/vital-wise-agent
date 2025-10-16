@@ -1,4 +1,9 @@
 project_id = "xwrrforhndpinxatxqda"
 
+[auth]
+enable_signup = true
+# Disable email confirmation requirement
+enable_confirmations = false
+
 [functions."parse-prescription"]
 verify_jwt = false
